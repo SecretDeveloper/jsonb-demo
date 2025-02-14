@@ -10,100 +10,88 @@ This project demonstrates how to:
 
 ## Prerequisites
 - **Docker** and **Docker Compose** installed on your machine.
-- **.NET SDK 7.0** (if you want to run the project locally outside of Docker).
+- **.NET SDK 9.0** (if you want to run the project locally outside of Docker).
 - A text editor or IDE that supports C# (optional, but recommended).
 
-## Project Files
-├─ XmlToJsonConsoleApp/
-├─ Dockerfile
-├─ docker-compose.yml
-├─ init_db.sql
-├─ Program.cs
-├─ XmlToJsonConsoleApp.csproj
-└─ example.xml
-
-- **Dockerfile**: The multi-stage build file for the .NET console app container.
+## Project files
 - **docker-compose.yml**: Orchestrates both Postgres and the console app.
-- **init_db.sql**: SQL script to create the `json_data` table in the database.
-- **Program.cs**: Main code for the console app (includes `run`, `list`, and `show` commands).
-- **XmlToJsonConsoleApp.csproj**: The .NET project file.
-- **example.xml**: A sample XML file for demo.
+- **init_db.sql**: SQL script to create the `demodata` table in the database.
+- **src//jsonbdemo/Program.cs**: Main code for the console app (includes `upload`, `list`, and `show` commands).
+- **jsonbdemo.csproj**: The .NET project file.
+- **test.xml**: A sample XML file for demo.
 
 ## How It Works
-1. **Build & Run**: Docker Compose builds the .NET app image and starts a PostgreSQL container.
-2. **Initialize DB**: The `init_db.sql` script runs inside the Postgres container to create the required table (`json_data`).
-3. **Commands**:
-   - `run <xml_file>`: Reads the XML from `<xml_file>`, converts it to JSON, inserts JSON into `json_data`.
-   - `list`: Lists IDs of all rows in `json_data`.
-   - `show <id>`: Displays the JSON data for the specified record ID in a pretty-printed format.
+1. **Build & Run**: Docker Compose a PostgreSQL container.
+2. **Initialize DB**: The `init_db.sql` script runs inside the Postgres container to create the required table (`demodata`).
+3. **Commands (from the /src/jsonbdemo folder)**:
+   - `dotnet run -- upload <xml_file>`: Reads the XML from `<xml_file>`, converts it to JSON, inserts JSON into `demodata`.
+   - `dotnet run -- list`: Lists IDs of all rows in `demodata`.
+   - `dotnet run -- show <id>`: Displays the JSON data for the specified record ID in a pretty-printed format.
 
 ## Step-by-Step: Running the Demo
 
 1. **Clone or Copy the Project**
    Make sure the files described above are in one folder.
 
-2. **Check `docker-compose.yml`**
-   - Confirm the environment variables (database, user, password).
-   - By default, the database is named `mydb`, user `myuser`, password `mypass`.
+1. **Run Docker Compose**
 
-3. **Run Docker Compose**
-   From the project directory, run:
+    From the project directory, run:
    ```bash
-   docker-compose build
    docker-compose up
    ```
+    This will:
+    - Spin up the db (Postgres) container.
+    - Run the init_db.sql to create the demodata table.
+
+1. **Verify Postgres is Running** You should see logs for the Postgres container in the console and a message indicating the table was created.
+
+    You can also log into the postgres db by running the following commands:
+      ```bash
+        docker exec -it "jsonb-demo" psql -U demo -d jsonbdemo
+      ```
+    Once logged in you can you can run queries:
+      ```bash
+        jsonbdemo-# select * from demodata;
+      ```
+      press 'q' to exit query result view.
 
 
-This will:
+1. **Build the Client app** Open a new terminal and cd into /src/jsonbdemo/ directory containing the dotnet project.
 
-- Build the .NET console app image.
-- Spin up both db (Postgres) and app (the console app) containers.
-- Run the init_db.sql to create the json_data table.
 
-4. Verify Postgres is Running
-You should see logs for the Postgres container in the console and a message indicating the table was created.
+### Running the demo
 
-5. Use the App Commands
-The app container automatically runs the command specified in docker-compose.yml. By default, it might run run example.xml once and then stop. To run other commands, do the following steps:
+#### Convert an XML file and store it as JSON in DB:
+  ```bash
+    dotnet run -- upload ./test.xml
+  ```
 
-  1. Open a new terminal (leave the Docker containers running).
-  2. Get the running app container name (e.g., my-console-app) by running docker ps.
-  3. Run a command inside that container:
+#### List the entries:
+  ```bash
+    dotnet run -- list
+  ```
 
-bash
-Copy
-docker exec -it my-console-app dotnet XmlToJsonConsoleApp.dll run example.xml
-Or you can do:
-
-bash
-Copy
-docker-compose run app dotnet XmlToJsonConsoleApp.dll run example.xml
-This will insert the JSON version of example.xml into the DB.
-
-List the entries:
-
-bash
-Copy
-docker exec -it my-console-app dotnet XmlToJsonConsoleApp.dll list
-You should see the IDs of the inserted rows (e.g., 1, 2, 3...).
-
-Show an entry:
-
-bash
-Copy
-docker exec -it my-console-app dotnet XmlToJsonConsoleApp.dll show 1
+#### Show an entry:
+  ```bash
+    dotnet run -- list show 1
+  ```
 This fetches the JSON for row id=1 and prints it (with indentation).
 
-Check Data in Postgres
+### Check Data in Postgres
 
-Use docker exec -it my-postgres psql -U myuser -d mydb to access the Postgres prompt.
-Run SELECT * FROM json_data; to see your rows.
-Stop the Containers
+Use
+```bash
+docker exec -it my-postgres psql -U myuser -d mydb
+```
+ to access the Postgres prompt.
+Run
+```sql
+SELECT * FROM demodata;
+```
+to see your rows.
+
+### Stop the Containers
 Press Ctrl + C in the terminal where docker-compose up is running or run:
-
-bash
-Copy
-docker-compose down
-Notes
-You can change the connection string or the Postgres user/password in docker-compose.yml.
-You can run the .NET console app locally (outside Docker) as long as you have the right connection string pointing to your Postgres instance.
+```bash
+  docker-compose down
+```
