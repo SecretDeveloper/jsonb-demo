@@ -84,7 +84,7 @@ This fetches the JSON for row id=1 and prints it (with indentation).
 
 Use
 ```bash
-docker exec -it my-postgres psql -U myuser -d mydb
+docker exec -it "jsonb-demo" psql -U demo -d jsonbdemo
 ```
  to access the Postgres prompt.
 Run
