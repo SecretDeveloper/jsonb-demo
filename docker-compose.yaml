@@ -1,0 +1,12 @@
+services:
+db:
+  image: postgres:15
+  container_name: jsonbdemo
+  environment:
+    POSTGRES_USER: demo
+    POSTGRES_PASSWORD: demo1
+    POSTGRES_DB: jsonbdemo
+  ports:
+    - "5432:5432"
+  volumes:
+    - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql

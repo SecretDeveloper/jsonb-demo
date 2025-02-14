@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS demodata (
+    id SERIAL PRIMARY KEY,
+    data JSONB NOT NULL
+);
