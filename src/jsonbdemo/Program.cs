@@ -24,7 +24,7 @@ public class Program
             if (args.Length == 0)
             {
                 Console.WriteLine("Usage:");
-                Console.WriteLine("  run <xml_file>");
+                Console.WriteLine("  upload <xml_file>");
                 Console.WriteLine("  list");
                 Console.WriteLine("  show <id>");
                 return;
@@ -39,17 +39,13 @@ public class Program
                         Console.WriteLine("Please specify an XML file after 'upload'.");
                         return;
                     }
+
                     string xmlFilePath = args[1];
                     var result = UploadCommand(xmlFilePath);
                     if (result.OK)
-                    {
-
                         Console.WriteLine($"{result.Value} rows inserted.");
-                    }
                     else
-                    {
                         Console.WriteLine($"Error: {result.Error}");
-                    }
 
                     break;
 
@@ -77,20 +73,19 @@ public class Program
                         return;
                     }
                     var showResult = GetEntry(entryId);
-                    if (showResult.OK)
+                    if (showResult.OK == false)
                     {
-                        Console.WriteLine($"The following data was found for entry {entryId}");
-
-                        // Using Newtonsoft.Json instead of System.Text.Json
-                        string prettyJson = Newtonsoft.Json.JsonConvert.SerializeObject(showResult.Value, Newtonsoft.Json.Formatting.Indented);
-                        Console.WriteLine(prettyJson);
-
-                        Console.WriteLine($"{prettyJson}");
+                        Console.WriteLine($"Error: {showResult.Error}");
+                        return;
                     }
+                    Console.WriteLine($"The following data was found for entry {entryId}");
+                    // Using Newtonsoft.Json instead of System.Text.Json
+                    string prettyJson = Newtonsoft.Json.JsonConvert.SerializeObject(showResult.Value, Newtonsoft.Json.Formatting.Indented);
+                    Console.WriteLine($"{prettyJson}");
                     break;
 
                 default:
-                    Console.WriteLine($"Unknown command '{args[0]}'. Supported commands: run, list, show");
+                    Console.WriteLine($"Unknown command '{args[0]}'. Supported commands: upload, list, show");
                     break;
             }
 

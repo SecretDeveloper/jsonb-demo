@@ -20,6 +20,9 @@ This project demonstrates how to:
 - **jsonbdemo.csproj**: The .NET project file.
 - **test.xml**: A sample XML file for demo.
 
+
+![alt text](screenshot.jpg)
+
 ## How It Works
 1. **Build & Run**: Docker Compose a PostgreSQL container.
 2. **Initialize DB**: The `init_db.sql` script runs inside the Postgres container to create the required table (`demodata`).
